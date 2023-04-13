@@ -36,7 +36,8 @@ function Landing() {
 
     const [dropAthlete, setDropAthlete] = useState(false);
     const [dropTeam, setDropTeam] = useState(false);
-    const athletes = ["Henry Farahani", "Andre Francis", "Kyria Moore", "Alexa Boller", "Maeve Duggan", "Kathryn Lynn", "Kaity Zagar", "Dom Testani", "Nick Monty"];
+    // const athletes = ["Henry Farahani", "Andre Francis", "Kyria Moore", "Alexa Boller", "Maeve Duggan", "Kathryn Lynn", "Kaity Zagar", "Dom Testani", "Nick Monty"];
+    const athletes = {"Henry Farahani": 1, "Andre Francis": 2, "Kyria Moore": 3, "Alexa Boller": 4, "Maeve Duggan": 5, "Kathryn Lynn": 6, "Kaity Zagar": 7, "Dom Testani": 8, "Nick Monty": 9};
 
     return(
         <Box sx={{ width: '100%', justifyContent:'center', marginTop:4, display:'flex' }}>
@@ -50,8 +51,18 @@ function Landing() {
                 </Item>
                 {dropAthlete &&
                     <List>
-                        {athletes.map(athlete =>
+                        {/* {athletes.map(athlete =>
                             <Link to="/athlete" >
+                                <Divider />
+                                <ListItemButton sx={{textAlign:"center" }}>
+                                    <ListItemText primary={athlete} sx={{}} />
+                                </ListItemButton>
+                                <Divider />
+                            </Link>
+                        )} */}
+
+                        {Object.keys(athletes).map(athlete =>
+                            <Link to={"/athlete/?id=" + athletes[athlete]} >
                                 <Divider />
                                 <ListItemButton sx={{textAlign:"center" }}>
                                     <ListItemText primary={athlete} sx={{}} />

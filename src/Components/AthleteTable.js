@@ -3,8 +3,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useTable, useFilter, useSortBy } from 'react-table';
 import Plot from 'react-plotly.js';
 
-async function FetchData() {
-    const res = fetch("https://tf-data-hub-default-rtdb.firebaseio.com/Athlete.json", {
+async function FetchData(id) {
+    const res = fetch("https://tf-data-hub-default-rtdb.firebaseio.com/Athletes/" + id + ".json", {
         method: "GET"
     });
     return((await res).json());
@@ -72,9 +72,13 @@ function AthleteTable() {
     const [performances, setPerformances] = useState([]);
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    // const id = 1;
 
     useEffect(() => {
-        FetchData().then(res => {
+        FetchData(id).then(res => {
             setFirstName(res.firstName);
             setLastName(res.lastName);
             setTeamName(res.team);
