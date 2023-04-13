@@ -1,0 +1,18 @@
+.tableOuter {
+    text-align:center;
+    justify-content: center;
+}
+
+header {
+    background-color: #474c5b;
+    color: white
+}
+
+.tableClass {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cell {
+    border-style: solid
+}
