@@ -108,6 +108,12 @@ function AthleteTable() {
                         "events": res[obj].events,
                         "date": res[obj].date
                     });
+
+                    performances.sort(function (a,b){
+                        return new Date(b.date) - new Date(a.date);
+                    });
+
+                    console.log(performances);
                 }
             }
 
