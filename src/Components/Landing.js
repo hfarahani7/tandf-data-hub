@@ -11,7 +11,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { List, ListItem, Divider, ListItemText, ListItemButton } from '@mui/material';
+import { List, Divider, ListItemText, ListItemButton } from '@mui/material';
 import { Link } from "react-router-dom";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -30,14 +30,53 @@ const SubItem = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
 }));
 
-function Landing() {
-    // const [athleteList, setAthleteList] = useEffect([{"Henry Farahani": 1}]);
-    // const [teamList, setTeamList] = useEffect([{"Adelphi": 1}]);
+function fetchAthletes() {
+    return(
+        fetch("https://tf-data-hub-default-rtdb.firebaseio.com/Athletes.json", {
+        method: "GET"
+    })
+    .then(res => res.json())
+    );
+}
 
+function fetchTeams() {
+    return(
+        fetch("https://tf-data-hub-default-rtdb.firebaseio.com/Teams.json", {
+        method: "GET"
+    })
+    .then(res => res.json())
+    );
+}
+
+function Landing() {
+    const [loading, setLoading]= useState(true);
     const [dropAthlete, setDropAthlete] = useState(false);
     const [dropTeam, setDropTeam] = useState(false);
-    // const athletes = ["Henry Farahani", "Andre Francis", "Kyria Moore", "Alexa Boller", "Maeve Duggan", "Kathryn Lynn", "Kaity Zagar", "Dom Testani", "Nick Monty"];
-    const athletes = {"Henry Farahani": 1, "Andre Francis": 2, "Kyria Moore": 3, "Alexa Boller": 4, "Maeve Duggan": 5, "Kathryn Lynn": 6, "Kaity Zagar": 7, "Dom Testani": 8, "Nick Monty": 9};
+    const [athletes, setAthletes] = useState({});
+    const [teams, setTeams] = useState({});
+
+    useEffect(() => {
+        const temp = {};
+        fetchAthletes().then(data  => {
+            for (const athlete in data) {
+                if (data[athlete] !== null) {
+                    const tempRow = (data[athlete].firstName + " " + data[athlete].lastName);
+                    temp[tempRow] = parseInt(athlete);
+                }
+            }
+            setAthletes(temp);
+            setLoading(false);
+        });
+
+        fetchTeams().then(data  => {
+            const temp1 = data;
+            setTeams(temp1);
+        });
+    }, [])
+    
+    if(loading) {
+        return(<div> Loading </div>)
+    }
 
     return(
         <Box sx={{ width: '100%', justifyContent:'center', marginTop:4, display:'flex' }}>
@@ -51,16 +90,6 @@ function Landing() {
                 </Item>
                 {dropAthlete &&
                     <List>
-                        {/* {athletes.map(athlete =>
-                            <Link to="/athlete" >
-                                <Divider />
-                                <ListItemButton sx={{textAlign:"center" }}>
-                                    <ListItemText primary={athlete} sx={{}} />
-                                </ListItemButton>
-                                <Divider />
-                            </Link>
-                        )} */}
-
                         {Object.keys(athletes).map(athlete =>
                             <Link to={"/athlete/?id=" + athletes[athlete]} >
                                 <Divider />
@@ -81,7 +110,15 @@ function Landing() {
                 </Item>
                 {dropTeam &&
                     <List>
-
+                        {Object.keys(teams).map(team => 
+                            <Link to={"/team/?id=" + teams[team].id} >
+                                <Divider />
+                                <ListItemButton sx={{textAlign:"center"}}>
+                                    <ListItemText primary={team} sx={{}} />
+                                </ListItemButton>
+                                <Divider />
+                            </Link>
+                        )}
                     </List>
                 }
                 <Item>

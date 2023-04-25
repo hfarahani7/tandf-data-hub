@@ -2,6 +2,8 @@ import './styles/AthleteTable.css';
 import React, { useState, useEffect, useMemo } from "react";
 import { useTable, useFilter, useSortBy } from 'react-table';
 import Plot from 'react-plotly.js';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
 
 async function FetchData(id) {
     const res = fetch("https://tf-data-hub-default-rtdb.firebaseio.com/Athletes/" + id + ".json", {
@@ -12,15 +14,18 @@ async function FetchData(id) {
 
 function GetEvents(performances) {
     const eventArr = [];
+    var i = 0;
 
     performances.forEach(meetObject => {
         for (const eventName in meetObject.events) {
             if(!eventArr.some(e => e.Header === eventName)){
                 eventArr.push({
                     "Header": eventName,
-                    "accessor": eventName
+                    "accessor": eventName,
+                    "checked": i == 0 ? true: false
                 });
             }
+            i++;
         }
     });
 
@@ -43,7 +48,19 @@ function GetPerformances(performances) {
     return(performanceArray);
 }
 
-function PreparePlotData(performances, event) {    
+function HandleCheck(performances, event, checked, setChecked, setPlotData) {
+    setChecked(
+        checked.map((ev) => 
+            ev.Header == event
+                ? { ...ev, checked: true}
+                : {...ev, checked: false}
+        )
+    );
+
+    setPlotData(PreparePlotData(performances, event));
+}
+
+function PreparePlotData(performances, event) { 
     const x = [];
     const y = []; 
     performances.forEach(meetObject => {
@@ -72,10 +89,11 @@ function AthleteTable() {
     const [performances, setPerformances] = useState([]);
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
+    const [checked, setChecked] = useState([]);
+    const [plotData, setPlotData] = useState();
     
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    // const id = 1;
 
     useEffect(() => {
         FetchData(id).then(res => {
@@ -84,7 +102,7 @@ function AthleteTable() {
             setTeamName(res.team);
 
             for(const obj in res) {
-                if(obj != "firstName" && obj != "lastName" && obj != "team" && !performances.some(meet => meet.meet === obj)) {
+                if(obj != "firstName" && obj != "lastName" && obj != "team" && obj != "teamId" && !performances.some(meet => meet.meet === obj)) {
                     performances.push({
                         "meet": obj,
                         "events": res[obj].events,
@@ -109,10 +127,14 @@ function AthleteTable() {
                     columns: GetEvents(performances)
                 }
             ]);
+
+            setChecked(GetEvents(performances));
+            
             setLoading(false);
+        }).then(() => {
+            setPlotData(PreparePlotData(performances, GetEvents(performances)[0].Header));
         });
     }, []);
-
 
     const tableInstance = useTable(
         {
@@ -133,11 +155,6 @@ function AthleteTable() {
         return(<div>Loading</div>)
     }
 
-    // const plots = [];
-    // GetEvents(performances).forEach(event => {
-    //     plots.push(PreparePlotData(performances, event));
-    // });
-
     return(
         <div className="tableOuter">
             <header>
@@ -151,16 +168,25 @@ function AthleteTable() {
 
             <Plot
                 data={[
-                    PreparePlotData(performances, "HT"),
+                    // PreparePlotData(performances, "HT"),
+                    plotData,
                     {type: 'bar', x: [], y: []},
                 ]}
                 layout={ {width: 1000, height: 1000, title: 'Performances'} }
             />
 
-            {/* <Plot 
-                data={plots}
-                layout={ {width: 1000, height: 1000, title: 'Performances'} }
-            /> */}
+            <Grid container xs={12} justifyContent="center">
+                {checked.map(event =>
+                    <Grid item>
+                        {event.Header}
+                        <Checkbox 
+                            label={event.Header} 
+                            checked={event.checked}
+                            onChange={() => {HandleCheck(performances, event.Header, checked, setChecked, setPlotData)}}
+                        />
+                    </Grid>
+                )}
+            </Grid>
 
             <table {...getTableProps()} className="tableClass">
                 <thead>
