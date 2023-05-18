@@ -178,7 +178,8 @@ function AthleteTable() {
                     plotData,
                     {type: 'bar', x: [], y: []},
                 ]}
-                layout={ {width: 1000, height: 1000, title: 'Performances'} }
+                layout={ {width: 500, height: 500, title: 'Performances'} }
+                // style={{ width:"100%" }}
             />
 
             <Grid container xs={12} justifyContent="center">

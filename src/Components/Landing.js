@@ -49,7 +49,7 @@ function fetchTeams() {
 }
 
 function Landing() {
-    const [loading, setLoading]= useState(true);
+    const [pageloading, setLoading]= useState(true);
     const [dropAthlete, setDropAthlete] = useState(false);
     const [dropTeam, setDropTeam] = useState(false);
     const [athletes, setAthletes] = useState({});
@@ -74,7 +74,7 @@ function Landing() {
         });
     }, [])
     
-    if(loading) {
+    if(pageloading) {
         return(<div> Loading </div>)
     }
 
